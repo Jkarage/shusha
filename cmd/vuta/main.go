@@ -8,14 +8,14 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf/v3"
-	"github.com/jkarage/vuta/external/logger"
+	"github.com/jkarage/vuta"
 	"go.uber.org/zap"
 )
 
 var build = "develop"
 
 func main() {
-	log, err := logger.New("vuta")
+	log, err := vuta.NewLogger("vuta")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

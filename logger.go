@@ -1,6 +1,6 @@
 // package logger provides a convenience function to constructing a logger
 // for use . This is required not just for application but for testing.
-package logger
+package vuta
 
 import (
 	"go.uber.org/zap"
@@ -9,7 +9,7 @@ import (
 
 // New constructs a Sugared logger that writes to stdout and
 // provides human-readable timestamps
-func New(service string, outputPaths ...string) (*zap.SugaredLogger, error) {
+func NewLogger(service string, outputPaths ...string) (*zap.SugaredLogger, error) {
 	config := zap.NewProductionConfig()
 
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
