@@ -1,13 +1,15 @@
 # vuta
+
 A tool to download files faster, Using concurrency in golang
 
-// single thread download down.
-// for testing you can run
+Downloading using a single thread down.
 
 ``` bash
-make  test-single
+make test-single
 ```
 
+This downloads a 20MB testing file in the root of the project.
 
 IN PROGRESS
+
 - Using multiple threads to download a file
