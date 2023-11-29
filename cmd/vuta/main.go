@@ -4,51 +4,28 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
+	"path"
 	"time"
 
 	"github.com/ardanlabs/conf/v3"
 	"github.com/jkarage/vuta"
-	"go.uber.org/zap"
 )
 
-var build = "develop"
+var build = "v1.0.0"
 
-func main() {
-	log, err := vuta.NewLogger("vuta")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
-	}
-
-	defer log.Sync()
-
-	if err := run(log); err != nil {
-		fmt.Println(err)
-		return
-
-	}
-}
-
-func run(log *zap.SugaredLogger) error {
-
-	// -----------------------------------------------------------------------------
-	// GOMAXPROCS
-	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
-
+func run() error {
 	cfg := struct {
 		conf.Version
-		Vuta struct {
-			ReadTimeout time.Duration `conf:"default:5s"`
-			IdleTimeout time.Duration `conf:"default:120s"`
-			URL         string        `conf:"required"`
-			Destination string        `conf:"default:."`
-			APIHost     string        `conf:"default:0.0.0.0:3000"`
+		Web struct {
+			ReadTimeout time.Duration `conf:"default:5s,flag:read-timeout"`
+			IdleTimeout time.Duration `conf:"default:120s,flag:idle-timeout"`
+			Verbose     bool          `conf:"default:false,flag:v"`
+			URL         string        `conf:"required,flag:url"`
 		}
 	}{
 		Version: conf.Version{
 			Build: build,
-			Desc:  "Download file, utilizing a concurrency in golang",
+			Desc:  "Vuta is a file downloader tool, utilizing concurrency in golang",
 		},
 	}
 
@@ -62,6 +39,21 @@ func run(log *zap.SugaredLogger) error {
 		return fmt.Errorf("parsing config: %w", err)
 	}
 
-	return nil
+	client := vuta.NewApp(cfg.Web.URL)
 
+	file, err := os.Create(path.Base(cfg.Web.URL))
+	if err != nil {
+		return err
+	}
+
+	client.Download(file)
+
+	return nil
+}
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Println(err)
+		return
+	}
 }
