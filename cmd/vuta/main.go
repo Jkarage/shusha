@@ -3,15 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path"
 	"time"
 
 	"github.com/ardanlabs/conf/v3"
 	"github.com/jkarage/vuta"
 )
 
-var build = "v1.0.0"
+var build = "develop"
 
 func run() error {
 	cfg := struct {
@@ -36,17 +34,48 @@ func run() error {
 			return nil
 		}
 
-		return fmt.Errorf("parsing config: %w", err)
+		return fmt.Errorf("%w", err)
 	}
 
 	client := vuta.NewApp(cfg.Web.URL)
+	// parts := path.Base(cfg.Web.URL)
 
-	file, err := os.Create(path.Base(cfg.Web.URL))
-	if err != nil {
-		return err
-	}
+	client.Download()
 
-	client.Download(file)
+	// cLength, _, _, err := vuta.Header(cfg.Web.URL)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// fmt.Println("CONTENT_LENGTH: ", cLength)
+
+	// threads := runtime.NumCPU()
+	// size := cLength / int64(threads)
+
+	// fmt.Println("THREADS: ", threads)
+	// fmt.Println("SIZE: ", size)
+
+	// start := 0
+	// end := size - 1
+	// var wg sync.WaitGroup
+
+	// wg.Add(runtime.NumCPU())
+
+	// for i := 0; i < threads-1; i++ {
+	// 	fmt.Println("send goroutine ", i, start, end)
+	// 	partName := fmt.Sprintf(parts+"%v", i+1)
+	// 	go client.DownloadChunks(partName, &wg, start, int(end))
+	// 	start = int(end) + 1
+	// 	end = int64(start) + (size - 1)
+	// }
+
+	// end = cLength - 1
+	// fmt.Println("sending the last goroutine", start, end)
+	// partName := fmt.Sprintf(parts+"%v", threads)
+	// go client.DownloadChunks(partName, &wg, start, int(end))
+
+	// // defer file.Close()
+	// wg.Wait()
 
 	return nil
 }
