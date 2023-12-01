@@ -9,14 +9,14 @@ import (
 	"sync"
 )
 
-type App struct {
+type Download struct {
 	*http.Client
 	url      string
 	shutdown chan<- error
 }
 
-func NewApp(url string) *App {
-	return &App{
+func NewDownload(url string) *Download {
+	return &Download{
 		Client: http.DefaultClient,
 		url:    url,
 	}
@@ -25,18 +25,17 @@ func NewApp(url string) *App {
 // Download uses single thread
 // downloads the file and saves it
 // in the file name provided
-func (app *App) Download() error {
-	fn, err := os.Create(path.Base(app.url))
+func (d *Download) Download() error {
+	fn, err := os.Create(path.Base(d.url))
 	if err != nil {
 		return err
 	}
 
-	resp, err := app.Get(app.url)
+	resp, err := d.Get(d.url)
 	if err != nil {
 		return err
 	}
-
-	// defer resp.Body.Close() // No need, the server closes this.
+	defer resp.Body.Close()
 
 	if _, err = io.Copy(fn, resp.Body); err != nil {
 		return err
@@ -48,11 +47,11 @@ func (app *App) Download() error {
 // Header returns header details of the file
 // returns the Content-Length, ETag,acceptRange, error
 // error if the header request fails
-func Header(url string) (int64, string, bool, error) {
+func (d *Download) Header() (int64, string, bool, error) {
 	var acceptRanges bool
 
 	// Make a head request to get file details
-	resp, err := http.DefaultClient.Head(url)
+	resp, err := http.DefaultClient.Head(d.url)
 	if err != nil {
 		return -1, "", acceptRanges, err
 	}
@@ -69,20 +68,20 @@ func Header(url string) (int64, string, bool, error) {
 
 // DownloadChunk gets chunks of bytes and assembles it.
 // to the file.
-func (app *App) DownloadChunks(f string, wg *sync.WaitGroup, start, end int) error {
+func (d *Download) DownloadChunks(f string, wg *sync.WaitGroup, start, end int) error {
 	defer wg.Done()
 
 	// Adds a Range Header to the request
 	r := fmt.Sprintf("bytes=%d-%d", start, end)
 
-	req, err := http.NewRequest(http.MethodGet, app.url, nil)
+	req, err := http.NewRequest(http.MethodGet, d.url, nil)
 	if err != nil {
 		return err
 	}
 
 	req.Header.Add("Range", r)
 
-	resp, err := app.Client.Do(req)
+	resp, err := d.Client.Do(req)
 	if err != nil {
 		return err
 	}

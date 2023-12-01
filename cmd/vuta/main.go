@@ -1,48 +1,27 @@
 package main
 
 import (
-	"errors"
+	"flag"
 	"fmt"
 	"time"
 
-	"github.com/ardanlabs/conf/v3"
-	"github.com/jkarage/vuta"
+	"github.com/jkarage/vuta/internal/vuta"
 )
 
-var build = "develop"
+var (
+	// build = "develop"
+	url = flag.String("url", "", "URL of the file to download")
+)
 
 func run() error {
-	cfg := struct {
-		conf.Version
-		Web struct {
-			ReadTimeout time.Duration `conf:"default:5s,flag:read-timeout"`
-			IdleTimeout time.Duration `conf:"default:120s,flag:idle-timeout"`
-			Verbose     bool          `conf:"default:false,flag:v"`
-			URL         string        `conf:"required,flag:url"`
-		}
-	}{
-		Version: conf.Version{
-			Build: build,
-			Desc:  "Vuta is a file downloader tool, utilizing concurrency in golang",
-		},
-	}
+	flag.Parse()
 
-	help, err := conf.Parse("Vuta", &cfg)
-	if err != nil {
-		if errors.Is(err, conf.ErrHelpWanted) {
-			fmt.Println(help)
-			return nil
-		}
+	now := time.Now()
 
-		return fmt.Errorf("%w", err)
-	}
-
-	client := vuta.NewApp(cfg.Web.URL)
-	// parts := path.Base(cfg.Web.URL)
-
+	client := vuta.NewDownload(*url)
 	client.Download()
 
-	// cLength, _, _, err := vuta.Header(cfg.Web.URL)
+	// cLength, _, _, err := vuta.Header()
 	// if err != nil {
 	// 	return err
 	// }
@@ -77,6 +56,7 @@ func run() error {
 	// // defer file.Close()
 	// wg.Wait()
 
+	fmt.Println(time.Since(now))
 	return nil
 }
 
@@ -85,4 +65,5 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
 }

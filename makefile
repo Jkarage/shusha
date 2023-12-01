@@ -11,7 +11,7 @@ deps-upgrade:
 	go mod vendor
 
 test-single:
-	go run cmd/vuta/main.go --url https://link.testfile.org/PDF20MB
+	go run cmd/vuta/main.go --url  https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2018-05.parquet
 
 help:
 	go run cmd/vuta/main.go --help
