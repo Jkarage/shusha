@@ -57,13 +57,13 @@ func (d *Download) Header() (int64, string, bool, error) {
 	}
 
 	contentLength := resp.ContentLength
-	eTag := resp.Header.Get("Etag")
+	fileName := path.Base(d.url)
 
 	if resp.Header.Get("Accept-Ranges") == "bytes" {
 		acceptRanges = true
 	}
 
-	return contentLength, eTag, acceptRanges, nil
+	return contentLength, fileName, acceptRanges, nil
 }
 
 // DownloadChunk gets chunks of bytes and assembles it.
