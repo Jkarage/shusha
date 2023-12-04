@@ -1,4 +1,4 @@
-package vuta
+package shusha
 
 import (
 	"fmt"

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf/v3"
-	"github.com/jkarage/vuta"
+	"github.com/jkarage/shusha"
 )
 
 func run() error {
@@ -20,7 +20,7 @@ func run() error {
 		return err
 	}
 
-	client := vuta.NewDownload(cfg.URL)
+	client := shusha.NewDownload(cfg.URL)
 	client.Download()
 
 	// cLength, name, _, err := client.Header()
