@@ -1,4 +1,4 @@
-module github.com/jkarage/vuta
+module github.com/jkarage/shusha
 
 go 1.21.2
 
